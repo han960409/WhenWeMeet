@@ -13,7 +13,7 @@ function Navbar() {
   const [member, setMember] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/auth/me", {
+    fetch("/api/auth/me", {
       credentials: "include",
     })
       .then((res) => {
@@ -29,7 +29,7 @@ function Navbar() {
   }, []);
 
   const logout = async () => {
-    await fetch("http://localhost:8080/api/auth/logout", {
+    await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });
@@ -50,7 +50,7 @@ function Navbar() {
           onClick={async () => {
             try {
               const response = await fetch(
-                "http://localhost:8080/api/auth/me",
+                "/api/auth/me",
                 {
                   credentials: "include",
                 }
@@ -108,7 +108,7 @@ function LoginPage() {
 
   const login = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -154,7 +154,7 @@ function LoginPage() {
           type="button"
           onClick={() => {
             window.location.href =
-              "http://localhost:8080/oauth2/authorization/google";
+              "/oauth2/authorization/google";
           }}
         >
           Google로 로그인
@@ -183,7 +183,7 @@ function SignupPage() {
 
   const signup = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/auth/signup", {
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -249,7 +249,7 @@ function HomePage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/rooms/invite/${inviteCode.trim()}`,
+        `/api/rooms/invite/${inviteCode.trim()}`,
         {
           credentials: "include",
         }
@@ -274,25 +274,6 @@ function HomePage() {
     }
   };
 
-  const goMyPage = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/me", {
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        alert("로그인 후 이용 가능합니다.");
-        navigate("/login");
-        return;
-      }
-
-      navigate("/mypage");
-    } catch (err) {
-      alert("로그인 확인 중 오류가 발생했습니다.");
-      navigate("/login");
-    }
-  };
-
   return (
     <div className="container">
       <section className="hero-section">
@@ -305,7 +286,7 @@ function HomePage() {
         </p>
 
         <div className="hero-actions">
-          <button onClick={goMyPage}>
+          <button onClick={() => navigate("/mypage")}>
             내 일정방 보기
           </button>
         </div>
@@ -339,7 +320,7 @@ function HomePage() {
             onClick={async () => {
               try {
                 const response = await fetch(
-                  "http://localhost:8080/api/auth/me",
+                  "/api/auth/me",
                   {
                     credentials: "include",
                   }
@@ -427,21 +408,21 @@ function MyPage() {
     const fetchMyPageData = async () => {
       try {
         const memberData = await fetchJson(
-          "http://localhost:8080/api/auth/me",
+          "/api/auth/me",
           "회원 정보 조회 실패"
         );
 
         setMember(memberData);
 
         const ownedData = await fetchJson(
-          "http://localhost:8080/api/mypage/rooms/owned",
+          "/api/mypage/rooms/owned",
           "내가 만든 방 조회 실패"
         );
 
         setOwnedRooms(Array.isArray(ownedData) ? ownedData : []);
 
         const joinedData = await fetchJson(
-          "http://localhost:8080/api/mypage/rooms/joined",
+          "/api/mypage/rooms/joined",
           "참여한 방 조회 실패"
         );
 
@@ -494,7 +475,7 @@ function MyPage() {
 
             try {
               const response = await fetch(
-                "http://localhost:8080/api/auth/me",
+                "/api/auth/me",
                 {
                   method: "DELETE",
                   credentials: "include",
@@ -585,7 +566,7 @@ function RoomPage() {
   });
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/rooms/${roomId}`, {
+    fetch(`/api/rooms/${roomId}`, {
       credentials: "include",
     })
       .then(async (res) => {
@@ -617,7 +598,7 @@ function RoomPage() {
         });
       });
 
-    fetch("http://localhost:8080/api/auth/me", {
+    fetch("/api/auth/me", {
       credentials: "include",
     })
       .then((res) => {
@@ -627,19 +608,19 @@ function RoomPage() {
       .then((data) => setMember(data))
       .catch(() => setMember(null));
 
-    fetch(`http://localhost:8080/api/rooms/${roomId}/result`, {
+    fetch(`/api/rooms/${roomId}/result`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => setDateCounts(data));
 
-    fetch(`http://localhost:8080/api/rooms/${roomId}/result/common`, {
+    fetch(`/api/rooms/${roomId}/result/common`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => setCommonDates(data));
 
-    fetch(`http://localhost:8080/api/rooms/${roomId}/participants`, {
+    fetch(`/api/rooms/${roomId}/participants`, {
       credentials: "include",
     })
       .then(async (res) => {
@@ -682,7 +663,7 @@ function RoomPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/rooms/${roomId}/confirm?date=${date}`,
+        `/api/rooms/${roomId}/confirm?date=${date}`,
         {
           method: "POST",
           credentials: "include",
@@ -709,7 +690,7 @@ function RoomPage() {
   const updateRoom = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/rooms/${roomId}`,
+        `/api/rooms/${roomId}`,
         {
           method: "PUT",
           credentials: "include",
@@ -747,25 +728,15 @@ function RoomPage() {
       alert("초대 링크 복사에 실패했습니다.");
     }
   };
-  const totalParticipantCount = participants.length;
 
-  const resultEvents = dateCounts.map((item) => {
-    const availableCount = item.participants.length;
-    const isAllAvailable =
-      totalParticipantCount > 0 && availableCount === totalParticipantCount;
-
-    return {
-      title: isAllAvailable
-        ? `모두 가능`
-        : `${availableCount}명 가능`,
-      date: item.date,
-      className: isAllAvailable ? "event-all-available" : "event-partial-available",
-    };
-  });
+  const resultEvents = dateCounts.map((item) => ({
+    title: `${item.participants.length}명 가능`,
+    date: item.date,
+  }));
 
   return (
     <div className="container">
-      <h1 className="room-title">{room.title}</h1>
+      <h1>{room.title}</h1>
 
       {room.confirmedDate && (
         <div className="card confirmed-card">
@@ -795,7 +766,7 @@ function RoomPage() {
           try {
 
             const response = await fetch(
-              `http://localhost:8080/api/rooms/${roomId}`,
+              `/api/rooms/${roomId}`,
               {
                 method: "DELETE",
                 credentials: "include",
@@ -828,9 +799,9 @@ function RoomPage() {
         <>
           <h2>방 정보 수정</h2>
 
+          <label>제목</label>
           <input
             value={editForm.title}
-            maxLength={30}
             onChange={(e) =>
               setEditForm({
                 ...editForm,
@@ -839,15 +810,9 @@ function RoomPage() {
             }
           />
 
-          <div className="text-count">
-            {editForm.title.length}/30
-          </div>
-
           <label>설명</label>
-
           <textarea
             value={editForm.description}
-            maxLength={200}
             onChange={(e) =>
               setEditForm({
                 ...editForm,
@@ -855,10 +820,6 @@ function RoomPage() {
               })
             }
           />
-
-          <div className="text-count">
-            {editForm.description.length}/200
-          </div>
 
           <label>시작일</label>
           <input
@@ -1074,7 +1035,7 @@ function InvitePage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/rooms/${room.id}/participants/me`,
+        `/api/rooms/${room.id}/participants/me`,
         {
           method: "DELETE",
           credentials: "include",
@@ -1099,7 +1060,7 @@ function InvitePage() {
     }
   };
   useEffect(() => {
-    fetch(`http://localhost:8080/api/rooms/invite/${inviteCode}`, {
+    fetch(`/api/rooms/invite/${inviteCode}`, {
       credentials: "include",
     })
       .then(async (res) => {
@@ -1118,7 +1079,7 @@ function InvitePage() {
         setRoom(data);
 
         return fetch(
-          `http://localhost:8080/api/rooms/${data.id}/participants/me`,
+          `/api/rooms/${data.id}/participants/me`,
           {
             credentials: "include",
           }
@@ -1135,7 +1096,7 @@ function InvitePage() {
           setParticipantId(data);
 
           return fetch(
-            `http://localhost:8080/api/participants/${data}/available-dates`,
+            `/api/participants/${data}/available-dates`,
             {
               credentials: "include",
             }
@@ -1166,7 +1127,7 @@ function InvitePage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/rooms/${room.id}/participants`,
+        `/api/rooms/${room.id}/participants`,
         {
           method: "POST",
           credentials: "include",
@@ -1200,7 +1161,7 @@ function InvitePage() {
   const saveAvailableDates = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/participants/${participantId}/available-dates`,
+        `/api/participants/${participantId}/available-dates`,
         {
           method: "POST",
           credentials: "include",

@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 
@@ -18,6 +19,9 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final MemberRepository memberRepository;
+
+        @Value("${app.frontend-url}")
+        private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -38,6 +42,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         request.getSession().setAttribute("LOGIN_MEMBER_ID", member.getId());
 
-        response.sendRedirect("http://localhost:5173/");
+        response.sendRedirect(frontendUrl);
     }
 }

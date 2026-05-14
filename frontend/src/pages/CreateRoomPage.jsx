@@ -24,14 +24,14 @@ function CreateRoomPage() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:8080/api/rooms", {
+        const response = await fetch("/api/rooms", {
         method: "POST",
         credentials: "include",
         headers: {
-          "Content-Type": "application/json",
+            "Content-Type": "application/json",
         },
         body: JSON.stringify(form),
-      });
+        });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
