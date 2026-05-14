@@ -13,6 +13,7 @@ import com.whenwemeet.room.dto.UpdateRoomRequest;
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,9 +38,16 @@ public class RoomController {
 
     @GetMapping("/{roomId}")
     public RoomResponse getRoom(
-            @PathVariable Long roomId
+            @PathVariable Long roomId,
+            HttpSession session
     ) {
-        return roomService.getRoom(roomId);
+        Long memberId = (Long) session.getAttribute("LOGIN_MEMBER_ID");
+
+        if (memberId == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+
+        return roomService.getRoom(roomId, memberId);
     }
 
     @GetMapping("/invite/{inviteCode}")

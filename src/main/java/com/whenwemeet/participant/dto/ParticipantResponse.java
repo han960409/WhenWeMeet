@@ -9,6 +9,7 @@ public class ParticipantResponse {
 
     private Long id;
     private String name;
-    
+    private String loginId;
+    private boolean owner;
 }
 

@@ -62,14 +62,16 @@ public class ParticipantService {
     }
 
     public List<ParticipantResponse> getRoomParticipants(Long roomId) {
-        return participantRepository.findByRoom_Id(roomId)
-                .stream()
-                .map(participant -> new ParticipantResponse(
-                        participant.getId(),
-                        participant.getName()
-                ))
-                .toList();
-        }
+    return participantRepository.findByRoom_Id(roomId)
+            .stream()
+            .map(participant -> new ParticipantResponse(
+                    participant.getId(),
+                    participant.getName(),
+                    participant.getMember().getLoginId(),
+                    participant.getRoom().isOwner(participant.getMember().getId())
+            ))
+            .toList();
+}
 
         @Transactional
         public void leaveRoom(Long roomId, Long memberId) {

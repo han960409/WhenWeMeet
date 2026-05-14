@@ -4,8 +4,12 @@ import "./App.css";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import CreateRoomPage from "./pages/CreateRoomPage";
+
 
 function Navbar() {
+  const navigate = useNavigate();
+
   const [member, setMember] = useState(null);
 
   useEffect(() => {
@@ -40,7 +44,32 @@ function Navbar() {
       </Link>
 
       <div className="nav-menu">
-        <Link to="/">방 만들기</Link>
+        
+
+        <button
+          onClick={async () => {
+            try {
+              const response = await fetch(
+                "http://localhost:8080/api/auth/me",
+                {
+                  credentials: "include",
+                }
+              );
+
+              if (!response.ok) {
+                alert("로그인 후 이용 가능합니다.");
+                navigate("/login");
+                return;
+              }
+
+              navigate("/rooms/new");
+            } catch (err) {
+              alert("로그인 확인 중 오류가 발생했습니다.");
+            }
+          }}
+        >
+          방 만들기
+        </button>
 
         {!member && (
           <>
@@ -53,8 +82,9 @@ function Navbar() {
           <>
             <Link to="/mypage">마이페이지</Link>
             <span>{member.name}님</span>
-            <button onClick={logout}>로그아웃</button>
-          </>
+            <button onClick={logout}>
+              로그아웃
+            </button> </>
         )}
       </div>
     </nav>
@@ -211,40 +241,6 @@ function HomePage() {
   });
   const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const createRoom = async () => {
-    setError("");
-
-    try {
-      const response = await fetch("http://localhost:8080/api/rooms", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "방 생성 실패");
-      }
-
-      const roomId = await response.json();
-
-      alert("방 생성 완료!");
-      navigate(`/rooms/${roomId}`);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   const enterByInviteCode = async () => {
     if (!inviteCode.trim()) {
       alert("초대코드를 입력해주세요.");
@@ -261,6 +257,7 @@ function HomePage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
+
         const message =
           errorData?.message ||
           (response.status === 500
@@ -279,87 +276,164 @@ function HomePage() {
 
   return (
     <div className="container">
-      <h1>WhenWeMeet</h1>
-      <p>팀 일정 조율방 만들기</p>
+      <section className="hero-section">
+        <div className="hero-badge">Team Schedule Planner</div>
 
-      <div className="card">
-        <h2>새 일정방 만들기</h2>
+        <h1 className="hero-title">WhenWeMeet</h1>
 
-        <label>제목</label>
-        <input name="title" value={form.title} onChange={handleChange} />
+        <p className="hero-description">
+          여러 사람의 가능한 날짜를 모아서 가장 좋은 만남 날짜를 쉽게 정하세요.
+        </p>
 
-        <label>설명</label>
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-        />
+        <div className="hero-actions">
+          <button onClick={() => navigate("/mypage")}>
+            내 일정방 보기
+          </button>
+        </div>
+      </section>
 
-        <label>시작일</label>
-        <input
-          type="date"
-          name="startDate"
-          value={form.startDate}
-          onChange={handleChange}
-        />
+      <section className="main-action-grid">
+        <div className="card main-action-card">
+          <h2>초대코드로 참여하기</h2>
+          <p className="sub-text">
+            받은 초대코드를 입력하고 일정 조율에 참여하세요.
+          </p>
 
-        <label>종료일</label>
-        <input
-          type="date"
-          name="endDate"
-          value={form.endDate}
-          onChange={handleChange}
-        />
+          <input
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+            placeholder="초대코드를 입력하세요"
+          />
 
-        <button onClick={createRoom}>방 만들기</button>
-      </div>
+          <button onClick={enterByInviteCode}>
+            참여하러 가기
+          </button>
+        </div>
 
-      <div className="card">
-        <h2>초대코드로 참여하기</h2>
+        <div className="card main-action-card">
+          <h2>새 일정방 만들기</h2>
+          <p className="sub-text">
+            모임 이름과 기간을 정하고 친구들에게 초대코드를 공유하세요.
+          </p>
 
-        <input
-          value={inviteCode}
-          onChange={(e) => setInviteCode(e.target.value)}
-          placeholder="초대코드를 입력하세요"
-        />
+          <button
+            onClick={async () => {
+              try {
+                const response = await fetch(
+                  "http://localhost:8080/api/auth/me",
+                  {
+                    credentials: "include",
+                  }
+                );
 
-        <button onClick={enterByInviteCode}>참여하러 가기</button>
-      </div>
+                if (!response.ok) {
+                  alert("로그인 후 이용 가능합니다.");
+                  navigate("/login");
+                  return;
+                }
+
+                navigate("/rooms/new");
+              } catch (err) {
+                alert("로그인 확인 중 오류가 발생했습니다.");
+              }
+            }}
+          >
+            일정방 만들기
+          </button>
+        </div>
+      </section>
+
+      <section className="card guide-card">
+        <h2>사용 방법</h2>
+
+        <div className="guide-grid">
+          <div>
+            <strong>1. 방 만들기</strong>
+            <p>모임 제목과 후보 기간을 설정합니다.</p>
+          </div>
+
+          <div>
+            <strong>2. 초대하기</strong>
+            <p>초대코드나 초대링크를 공유합니다.</p>
+          </div>
+
+          <div>
+            <strong>3. 날짜 선택</strong>
+            <p>참가자들이 가능한 날짜를 선택합니다.</p>
+          </div>
+
+          <div>
+            <strong>4. 일정 확정</strong>
+            <p>모두 가능한 날짜를 확인하고 일정을 확정합니다.</p>
+          </div>
+        </div>
+      </section>
 
       {error && <div className="error">{error}</div>}
     </div>
   );
 }
+
 function MyPage() {
   const navigate = useNavigate();
 
-  const [ownedRooms, setOwnedRooms, ] = useState([]);
+  const [ownedRooms, setOwnedRooms] = useState([]);
   const [member, setMember] = useState(null);
+  const [joinedRooms, setJoinedRooms] = useState([]);
 
   useEffect(() => {
-
-    fetch("http://localhost:8080/api/auth/me", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => setMember(data));
-
-    fetch("http://localhost:8080/api/mypage/rooms/owned", {
-      credentials: "include",
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.message || "마이페이지 조회 실패");
-        }
-
-        return res.json();
-      })
-      .then((data) => setOwnedRooms(data))
-      .catch((err) => {
-        alert(err.message);
+    const fetchJson = async (url, failMessage) => {
+      const res = await fetch(url, {
+        credentials: "include",
       });
 
+      if (!res.ok) {
+        const text = await res.text();
+
+        let message = failMessage;
+
+        try {
+          const errorData = JSON.parse(text);
+          message = errorData?.message || failMessage;
+        } catch (e) {
+          message = text || failMessage;
+        }
+
+        throw new Error(message);
+      }
+
+      return res.json();
+    };
+
+    const fetchMyPageData = async () => {
+      try {
+        const memberData = await fetchJson(
+          "http://localhost:8080/api/auth/me",
+          "회원 정보 조회 실패"
+        );
+
+        setMember(memberData);
+
+        const ownedData = await fetchJson(
+          "http://localhost:8080/api/mypage/rooms/owned",
+          "내가 만든 방 조회 실패"
+        );
+
+        setOwnedRooms(Array.isArray(ownedData) ? ownedData : []);
+
+        const joinedData = await fetchJson(
+          "http://localhost:8080/api/mypage/rooms/joined",
+          "참여한 방 조회 실패"
+        );
+
+        setJoinedRooms(Array.isArray(joinedData) ? joinedData : []);
+      } catch (err) {
+        console.error("마이페이지 조회 오류:", err);
+        alert(err?.message || "마이페이지 조회 중 오류가 발생했습니다.");
+      }
+    };
+
+    fetchMyPageData();
   }, []);
 
   return (
@@ -434,6 +508,28 @@ function MyPage() {
         ) : (
           <div className="date-grid">
             {ownedRooms.map((room) => (
+              <div className="date-card" key={room.id}>
+                <div className="date">{room.title}</div>
+                <div className="count">
+                  {room.startDate} ~ {room.endDate}
+                </div>
+
+                <button onClick={() => navigate(`/rooms/${room.id}`)}>
+                  상세보기
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="card">
+        <h2>내가 참여한 일정방</h2>
+
+        {joinedRooms.length === 0 ? (
+          <p>참여 중인 일정방이 없습니다.</p>
+        ) : (
+          <div className="date-grid">
+            {joinedRooms.map((room) => (
               <div className="date-card" key={room.id}>
                 <div className="date">{room.title}</div>
                 <div className="count">
@@ -623,6 +719,16 @@ function RoomPage() {
 
   const inviteUrl = `${window.location.origin}/invite/${room.inviteCode}`;
 
+
+  const copyInviteUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      alert("초대 링크가 복사되었습니다.");
+    } catch (err) {
+      alert("초대 링크 복사에 실패했습니다.");
+    }
+  };
+
   const resultEvents = dateCounts.map((item) => ({
     title: `${item.participants.length}명 가능`,
     date: item.date,
@@ -633,9 +739,16 @@ function RoomPage() {
       <h1>{room.title}</h1>
 
       {room.confirmedDate && (
-        <div className="card">
+        <div className="card confirmed-card">
+          <div className="confirmed-badge">
+            일정 확정 완료
+          </div>
+
           <h2>확정된 일정</h2>
-          <p>{room.confirmedDate}</p>
+
+          <p className="confirmed-date">
+            {room.confirmedDate}
+          </p>
         </div>
       )}
     {isOwner && (
@@ -751,7 +864,14 @@ function RoomPage() {
           <input value={room.inviteCode} readOnly />
 
           <p>초대 링크</p>
-          <input value={inviteUrl} readOnly />
+
+          <div className="copy-row">
+            <input value={inviteUrl} readOnly />
+
+            <button onClick={copyInviteUrl}>
+              복사
+            </button>
+          </div>
 
           {isOwner && (
             <button onClick={() => setEditMode(true)}>
@@ -776,9 +896,27 @@ function RoomPage() {
           <p>아직 참여자가 없습니다.</p>
         ) : (
           <div className="date-grid">
-            {participants.map((participant) => (
-              <div className="date-card" key={participant.id}>
-                <div className="date">{participant.name}</div>
+            {participants.map((participant, index) => (
+              <div className="participant-card" key={participant.id}>
+                <div className="participant-avatar">
+                  {participant.name?.charAt(0)}
+                </div>
+
+                <div className="participant-info">
+                  <div className="participant-name">
+                    {participant.name}
+                  </div>
+
+                  <div className="participant-role">
+                    {participant.loginId ? `@${participant.loginId}` : `참가자 #${participant.id}`}
+                  </div>
+
+                  {participant.owner && (
+                    <div className="owner-badge">
+                      👑 방장
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -808,23 +946,41 @@ function RoomPage() {
               const matched = dateCounts.find((item) => item.date === date);
               const dateParticipants = matched?.participants || [];
 
-              return (
-              <div className="date-card" key={date}>
-                <div className="date">{date}</div>
-
-                <div className="participants">
-                  참여자: {dateParticipants.join(", ")}
-                </div>
-
-                <div className="count">{dateParticipants.length}명</div>
-
-                {isOwner && (
-                  <button onClick={() => confirmDate(date)}>
-                    이 날짜로 확정
-                  </button>
-                )}
+          return (
+            <div className="date-card common-date-card" key={date}>
+              <div className="common-badge">
+                모두 가능
               </div>
-              );
+
+              <div className="date">
+                {date}
+              </div>
+
+              <div className="count">
+                {dateParticipants.length}명 가능
+              </div>
+
+              <div className="participants participant-chip-list">
+                {dateParticipants.map((participant) => (
+                  <span key={participant.id} className="participant-chip">
+                    {participant.name}
+                    {participant.loginId && (
+                      <small>@{participant.loginId}</small>
+                    )}
+                  </span>
+                ))}
+              </div>
+
+              {isOwner && (
+                <button
+                  className="confirm-date-button"
+                  onClick={() => confirmDate(date)}
+                >
+                  이 날짜로 확정
+                </button>
+              )}
+            </div>
+          );
             })}
           </div>
         )}
@@ -1017,6 +1173,7 @@ function InvitePage() {
   const events = selectedDates.map((date) => ({
     title: "가능",
     date,
+    className: "selected-date-event",
   }));
 
   return (
@@ -1067,6 +1224,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/rooms/new" element={<CreateRoomPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/rooms/:roomId" element={<RoomPage />} />

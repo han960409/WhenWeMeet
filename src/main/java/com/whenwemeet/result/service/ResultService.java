@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.whenwemeet.room.dto.UpdateRoomRequest;
 import org.springframework.transaction.annotation.Transactional;
+import com.whenwemeet.result.dto.ParticipantInfoResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,17 +22,21 @@ public class ResultService {
     private final AvailableDateRepository availableDateRepository;
     private final ParticipantRepository participantRepository;
 
-    public List<DateParticipantResponse> getResult(Long roomId) {
+        public List<DateParticipantResponse> getResult(Long roomId) {
         List<AvailableDate> availableDates =
                 availableDateRepository.findByParticipantRoomId(roomId);
 
-        Map<LocalDate, List<String>> grouped = availableDates.stream()
+        Map<LocalDate, List<ParticipantInfoResponse>> grouped = availableDates.stream()
                 .collect(Collectors.groupingBy(
                         AvailableDate::getAvailableDate,
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 list -> list.stream()
-                                        .map(availableDate -> availableDate.getParticipant().getName())
+                                        .map(availableDate -> new ParticipantInfoResponse(
+                                                availableDate.getParticipant().getId(),
+                                                availableDate.getParticipant().getName(),
+                                                availableDate.getParticipant().getMember().getLoginId()
+                                        ))
                                         .toList()
                         )
                 ));
@@ -42,7 +47,9 @@ public class ResultService {
                         entry.getValue()
                 ))
                 .toList();
-    }
+        }
+
+
 
     public List<LocalDate> getCommonAvailableDates(Long roomId) {
         long participantCount = participantRepository.countByRoomId(roomId);

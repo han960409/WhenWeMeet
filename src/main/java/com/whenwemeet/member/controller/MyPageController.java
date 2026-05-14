@@ -25,4 +25,15 @@ public class MyPageController {
 
         return roomService.getOwnedRooms(memberId);
     }
+
+    @GetMapping("/rooms/joined")
+    public List<RoomResponse> getJoinedRooms(HttpSession session) {
+        Long memberId = (Long) session.getAttribute("LOGIN_MEMBER_ID");
+
+        if (memberId == null) {
+            throw new IllegalArgumentException("로그인이 필요합니다.");
+        }
+
+        return roomService.getJoinedRooms(memberId);
+    }
 }
