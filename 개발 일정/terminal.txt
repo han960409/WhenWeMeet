@@ -2,13 +2,13 @@
 docker compose up -d
 
 - Spring Boot WAS
-$env:FRONTEND_URL="https://cityless-lapsible-marianna.ngrok-free.dev"
-$env:GOOGLE_REDIRECT_URI="https://cityless-lapsible-marianna.ngrok-free.dev/login/oauth2/code/google"
 .\gradlew.bat bootRun
 
 - React 프론트
 cd frontend
 npm run dev -- --host
 
-cd ngrok-v3-stable-windows-amd64
+
+집 : cd C:\Users\han96\
+학원 : cd ngrok-v3-stable-windows-amd64
 .\ngrok.exe http 5173
