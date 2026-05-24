@@ -150,18 +150,6 @@ function LoginPage() {
         />
 
         <button onClick={login}>로그인</button>
-        <button
-          type="button"
-          onClick={() => navigate("/find-login-id")}
-        >
-          아이디 찾기
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate("/password-reset")}
-        >
-          비밀번호 찾기
-        </button>
         <div className="social-login-box">
           <button
             type="button"
@@ -1673,8 +1661,6 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/rooms/new" element={<CreateRoomPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/password-reset" element={<PasswordResetPage />} />
-        <Route path="/find-login-id" element={<FindLoginIdPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/rooms/:roomId" element={<RoomPage />} />
         <Route path="/invite/:inviteCode" element={<InvitePage />} />
