@@ -1,6 +1,4 @@
 spring:
-  config:
-    import: optional:application-secret.properties
   mail:
     host: smtp.gmail.com
     port: 587
@@ -12,6 +10,10 @@ spring:
           auth: true
           starttls:
             enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
   application:
     name: whenwemeet
