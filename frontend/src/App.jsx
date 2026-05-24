@@ -202,68 +202,7 @@ function SignupPage() {
     });
   };
 
-  const sendEmailCode = async () => {
-    if (sendingEmailCode) return;
-
-    setSendingEmailCode(true);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/signup/email/code`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.email,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        alert(errorData?.message || "인증코드 발송 실패");
-        return;
-      }
-
-      alert("인증코드가 이메일로 발송되었습니다.");
-    } catch (err) {
-      alert("인증코드 발송 중 오류가 발생했습니다.");
-    } finally {
-      setSendingEmailCode(false);
-    }
-  };
-
-  const verifyEmailCode = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/signup/email/verify`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.email,
-          code: emailCode,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        alert(errorData?.message || "이메일 인증 실패");
-        return;
-      }
-
-      setEmailVerified(true);
-      alert("이메일 인증이 완료되었습니다.");
-    } catch (err) {
-      alert("이메일 인증 중 오류가 발생했습니다.");
-    }
-  };
-
   const signup = async () => {
-
-    
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: "POST",
@@ -279,11 +218,10 @@ function SignupPage() {
 
         try {
           const errorData = JSON.parse(errorText);
-
           alert(
             errorData.message ||
-            Object.values(errorData)[0] ||
-            "회원가입 실패"
+              Object.values(errorData)[0] ||
+              "회원가입 실패"
           );
         } catch {
           alert(errorText || "회원가입 실패");
@@ -319,50 +257,6 @@ function SignupPage() {
           placeholder="example@email.com"
         />
 
-        <div className="email-verify-box">
-          <button
-            type="button"
-            onClick={sendEmailCode}
-            disabled={sendingEmailCode || emailVerified}
-          >
-            {sendingEmailCode
-              ? "인증코드 발송 중..."
-              : emailVerified
-              ? "이메일 인증 완료"
-              : "인증코드 발송"}
-          </button>
-
-          {sendingEmailCode && (
-            <p className="loading-text">
-              이메일을 보내는 중입니다. 잠시만 기다려주세요.
-            </p>
-          )}
-
-          {!emailVerified && (
-            <>
-              <label>이메일 인증코드</label>
-              <input
-                value={emailCode}
-                onChange={(e) => setEmailCode(e.target.value)}
-                placeholder="인증코드 6자리"
-              />
-
-              <button
-                type="button"
-                onClick={verifyEmailCode}
-              >
-                인증코드 확인
-              </button>
-            </>
-          )}
-
-          {emailVerified && (
-            <p className="verified-text">
-              이메일 인증이 완료되었습니다.
-            </p>
-          )}
-        </div>
-
         <label>비밀번호</label>
         <input
           type="password"
@@ -372,97 +266,6 @@ function SignupPage() {
         />
 
         <button onClick={signup}>회원가입</button>
-      </div>
-    </div>
-  );
-}
-
-function FindLoginIdPage() {
-  const navigate = useNavigate();
-
-  const [sending, setSending] = useState(false);
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-  });
-
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const findLoginId = async () => {
-    if (sending) {
-      return;
-    }
-
-    setSending(true);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/find-login-id`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        alert(errorData?.message || "아이디 찾기 실패");
-        return;
-      }
-
-      alert("입력한 이메일로 아이디를 발송했습니다.");
-      navigate("/login");
-    } catch (err) {
-      alert("아이디 찾기 중 오류가 발생했습니다.");
-    } finally {
-      setSending(false);
-    }
-  };
-
-  return (
-    <div className="container">
-      <div className="card">
-        <h1>아이디 찾기</h1>
-
-        <label>이름</label>
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-        />
-
-        <label>이메일</label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="example@email.com"
-        />
-
-        <button onClick={findLoginId} disabled={sending}>
-          {sending ? "아이디 발송 중..." : "아이디 찾기"}
-        </button>
-
-        {sending && (
-          <p className="loading-text">
-            이메일을 보내는 중입니다. 잠시만 기다려주세요.
-          </p>
-        )}
-
-        <button
-          type="button"
-          onClick={() => navigate("/login")}
-        >
-          로그인으로 돌아가기
-        </button>
       </div>
     </div>
   );
