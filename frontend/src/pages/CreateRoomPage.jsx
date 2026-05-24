@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function CreateRoomPage() {
   const navigate = useNavigate();
 
@@ -24,14 +26,14 @@ function CreateRoomPage() {
     setError("");
 
     try {
-        const response = await fetch("/api/rooms", {
+      const response = await fetch(`${API_BASE_URL}/api/rooms`, {
         method: "POST",
         credentials: "include",
         headers: {
-            "Content-Type": "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(form),
-        });
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
@@ -43,7 +45,7 @@ function CreateRoomPage() {
       alert("방 생성 완료!");
       navigate(`/rooms/${roomId}`);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "방 생성 중 오류가 발생했습니다.");
     }
   };
 
@@ -61,9 +63,7 @@ function CreateRoomPage() {
           maxLength={30}
         />
 
-        <div className="text-count">
-            {form.title.length}/30
-        </div>
+        <div className="text-count">{form.title.length}/30</div>
 
         <label>설명</label>
         <textarea
@@ -74,9 +74,7 @@ function CreateRoomPage() {
           maxLength={200}
         />
 
-        <div className="text-count">
-        {form.description.length}/200
-        </div>
+        <div className="text-count">{form.description.length}/200</div>
 
         <label>시작일</label>
         <input
@@ -96,10 +94,7 @@ function CreateRoomPage() {
 
         <button onClick={createRoom}>방 만들기</button>
 
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-        >
+        <button type="button" onClick={() => navigate("/")}>
           메인으로 돌아가기
         </button>
       </div>
