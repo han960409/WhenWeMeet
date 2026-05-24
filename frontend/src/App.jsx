@@ -8,13 +8,15 @@ import CreateRoomPage from "./pages/CreateRoomPage";
 import googleImage from "./google.png";
 import whenwemeetImage from "./WhenWeMeet.png";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
 function Navbar() {
   const navigate = useNavigate();
 
   const [member, setMember] = useState(null);
 
   useEffect(() => {
-    fetch("/api/auth/me", {
+    fetch(`${API_BASE_URL}/api/auth/me`, {
       credentials: "include",
     })
       .then((res) => {
@@ -30,7 +32,7 @@ function Navbar() {
   }, []);
 
   const logout = async () => {
-    await fetch("/api/auth/logout", {
+    await fetch(`${API_BASE_URL}/api/auth/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -51,7 +53,7 @@ function Navbar() {
           onClick={async () => {
             try {
               const response = await fetch(
-                "/api/auth/me",
+                `${API_BASE_URL}/api/auth/me`,
                 {
                   credentials: "include",
                 }
@@ -109,7 +111,7 @@ function LoginPage() {
 
   const login = async () => {
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -166,7 +168,7 @@ function LoginPage() {
             className="google-login-btn"
             onClick={() => {
               window.location.href =
-                "/oauth2/authorization/google";
+                `${import.meta.env.VITE_API_BASE_URL}/oauth2/authorization/google`;
             }}
           >
             <img
@@ -209,7 +211,7 @@ function SignupPage() {
     setSendingEmailCode(true);
 
     try {
-      const response = await fetch("/api/auth/signup/email/code", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup/email/code`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -236,7 +238,7 @@ function SignupPage() {
 
   const verifyEmailCode = async () => {
     try {
-      const response = await fetch("/api/auth/signup/email/verify", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup/email/verify`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -269,7 +271,7 @@ function SignupPage() {
     }
 
     try {
-      const response = await fetch("/api/auth/signup", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -406,7 +408,7 @@ function FindLoginIdPage() {
     setSending(true);
 
     try {
-      const response = await fetch("/api/auth/find-login-id", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/find-login-id`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -501,7 +503,7 @@ function PasswordResetPage() {
     setSendingCode(true);
 
     try {
-      const response = await fetch("/api/auth/password-reset/code", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/password-reset/code`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -530,7 +532,7 @@ function PasswordResetPage() {
 
   const verifyCode = async () => {
     try {
-      const response = await fetch("/api/auth/password-reset/verify", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/password-reset/verify`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -558,7 +560,7 @@ function PasswordResetPage() {
 
   const resetPassword = async () => {
     try {
-      const response = await fetch("/api/auth/password-reset/confirm", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/password-reset/confirm`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -684,7 +686,7 @@ function HomePage() {
 
     try {
       const response = await fetch(
-        `/api/rooms/invite/${inviteCode.trim()}`,
+        `${API_BASE_URL}/api/rooms/invite/${inviteCode.trim()}`,
         {
           credentials: "include",
         }
@@ -755,7 +757,7 @@ function HomePage() {
             onClick={async () => {
               try {
                 const response = await fetch(
-                  "/api/auth/me",
+                  `${API_BASE_URL}/api/auth/me`,
                   {
                     credentials: "include",
                   }
@@ -843,21 +845,21 @@ function MyPage() {
     const fetchMyPageData = async () => {
       try {
         const memberData = await fetchJson(
-          "/api/auth/me",
+          `${API_BASE_URL}/api/auth/me`,
           "회원 정보 조회 실패"
         );
 
         setMember(memberData);
 
         const ownedData = await fetchJson(
-          "/api/mypage/rooms/owned",
+          `${API_BASE_URL}/api/mypage/rooms/owned`,
           "내가 만든 방 조회 실패"
         );
 
         setOwnedRooms(Array.isArray(ownedData) ? ownedData : []);
 
         const joinedData = await fetchJson(
-          "/api/mypage/rooms/joined",
+          `${API_BASE_URL}/api/mypage/rooms/joined`,
           "참여한 방 조회 실패"
         );
 
@@ -910,7 +912,7 @@ function MyPage() {
 
             try {
               const response = await fetch(
-                "/api/auth/me",
+                `${API_BASE_URL}/api/auth/me`,
                 {
                   method: "DELETE",
                   credentials: "include",
@@ -1005,7 +1007,7 @@ function RoomPage() {
   
 
   useEffect(() => {
-    fetch(`/api/rooms/${roomId}`, {
+    fetch(`${API_BASE_URL}/api/rooms/${roomId}`, {
       credentials: "include",
     })
       .then(async (res) => {
@@ -1037,7 +1039,7 @@ function RoomPage() {
         });
       });
 
-    fetch("/api/auth/me", {
+    fetch(`${API_BASE_URL}/api/auth/me`, {
       credentials: "include",
     })
       .then((res) => {
@@ -1047,19 +1049,19 @@ function RoomPage() {
       .then((data) => setMember(data))
       .catch(() => setMember(null));
 
-    fetch(`/api/rooms/${roomId}/result`, {
+    fetch(`${API_BASE_URL}/api/rooms/${roomId}/result`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => setDateCounts(data));
 
-    fetch(`/api/rooms/${roomId}/result/pending`, {
+    fetch(`${API_BASE_URL}/api/rooms/${roomId}/result/pending`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => setPendingParticipants(data));
 
-    fetch(`/api/rooms/${roomId}/result/common`, {
+    fetch(`${API_BASE_URL}/api/rooms/${roomId}/result/common`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -1067,7 +1069,7 @@ function RoomPage() {
 
     
 
-    fetch(`/api/rooms/${roomId}/participants`, {
+    fetch(`${API_BASE_URL}/api/rooms/${roomId}/participants`, {
       credentials: "include",
     })
       .then(async (res) => {
@@ -1112,7 +1114,7 @@ function RoomPage() {
 
     try {
       const response = await fetch(
-        `/api/rooms/${roomId}/confirm?date=${date}`,
+        `${API_BASE_URL}/api/rooms/${roomId}/confirm?date=${date}`,
         {
           method: "POST",
           credentials: "include",
@@ -1144,7 +1146,7 @@ function RoomPage() {
     }
 
     try {
-      const response = await fetch(`/api/rooms/${roomId}/confirm/cancel`, {
+      const response = await fetch(`${API_BASE_URL}/api/rooms/${roomId}/confirm/cancel`, {
         method: "POST",
         credentials: "include",
       });
@@ -1171,7 +1173,7 @@ function RoomPage() {
   const updateRoom = async () => {
     try {
       const response = await fetch(
-        `/api/rooms/${roomId}`,
+        `${API_BASE_URL}/api/rooms/${roomId}`,
         {
           method: "PUT",
           credentials: "include",
@@ -1272,7 +1274,7 @@ function RoomPage() {
           try {
 
             const response = await fetch(
-              `/api/rooms/${roomId}`,
+              `${API_BASE_URL}/api/rooms/${roomId}`,
               {
                 method: "DELETE",
                 credentials: "include",
@@ -1634,7 +1636,7 @@ function InvitePage() {
 
     try {
       const response = await fetch(
-        `/api/rooms/${room.id}/participants/me`,
+        `${API_BASE_URL}/api/rooms/${room.id}/participants/me`,
         {
           method: "DELETE",
           credentials: "include",
@@ -1659,7 +1661,7 @@ function InvitePage() {
     }
   };
   useEffect(() => {
-    fetch(`/api/rooms/invite/${inviteCode}`, {
+    fetch(`${API_BASE_URL}/api/rooms/invite/${inviteCode}`, {
       credentials: "include",
     })
       .then(async (res) => {
@@ -1678,7 +1680,7 @@ function InvitePage() {
         setRoom(data);
 
         return fetch(
-          `/api/rooms/${data.id}/participants/me`,
+          `${API_BASE_URL}/api/rooms/${data.id}/participants/me`,
           {
             credentials: "include",
           }
@@ -1695,7 +1697,7 @@ function InvitePage() {
           setParticipantId(data);
 
           return fetch(
-            `/api/participants/${data}/available-dates`,
+            `${API_BASE_URL}/api/participants/${data}/available-dates`,
             {
               credentials: "include",
             }
@@ -1726,7 +1728,7 @@ function InvitePage() {
 
     try {
       const response = await fetch(
-        `/api/rooms/${room.id}/participants`,
+        `${API_BASE_URL}/api/rooms/${room.id}/participants`,
         {
           method: "POST",
           credentials: "include",
@@ -1771,7 +1773,7 @@ function InvitePage() {
   const saveAvailableDates = async () => {
     try {
       const response = await fetch(
-        `/api/participants/${participantId}/available-dates`,
+        `${API_BASE_URL}/api/participants/${participantId}/available-dates`,
         {
           method: "POST",
           credentials: "include",
