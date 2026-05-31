@@ -20,6 +20,7 @@ public class CorsConfig {
                         .allowedOrigins(
                                 "http://localhost:5173",
                                 "https://when-we-meet-phi.vercel.app/"
+                                "https://han960409.github.io"
                         )
                         .allowedMethods("*")
                         .allowedHeaders("*")
