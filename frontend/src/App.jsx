@@ -37,7 +37,8 @@ function Navbar() {
       credentials: "include",
     });
 
-    window.location.href = "/";
+    window.location.href =
+    "https://hanproject-git.github.io/WhenWeMeet";
   };
 
   return (
