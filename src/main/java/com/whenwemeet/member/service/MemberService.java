@@ -22,6 +22,7 @@ import com.whenwemeet.member.dto.EmailVerificationCodeRequest;
 import com.whenwemeet.member.dto.EmailVerificationVerifyRequest;
 import com.whenwemeet.room.entity.Room;
 import com.whenwemeet.room.repository.RoomRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class MemberService {
     private final ParticipantRepository participantRepository;
     private final AvailableDateRepository availableDateRepository;
     private final MailService mailService;
+    private final PasswordEncoder passwordEncoder;
 
     private final Map<String, String> passwordResetCodes =
             new ConcurrentHashMap<>();
@@ -63,7 +65,7 @@ public class MemberService {
 
         Member member = new Member(
                 request.loginId(),
-                request.password(),
+                passwordEncoder.encode(request.password()),
                 request.name(),
                 request.email()
         );
@@ -85,11 +87,9 @@ public class MemberService {
                         )
                 );
 
-        if (!member.getPassword().equals(request.password())) {
-            throw new IllegalArgumentException(
-                    "아이디 또는 비밀번호가 올바르지 않습니다."
-            );
-        }
+        if (!passwordEncoder.matches(request.password(), member.getPassword())) {
+                throw new IllegalArgumentException("아이디 또는 비밀번호가 올바르지 않습니다.");
+                }
 
         return MemberResponse.from(member);
     }
