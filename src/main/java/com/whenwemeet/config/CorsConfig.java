@@ -19,8 +19,8 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:5173",
-                                "https://when-we-meet-phi.vercel.app/",
-                                "https://HanProject-git.github.io"
+                                "https://when-we-meet-phi.vercel.app",
+                                "https://hanproject-git.github.io"
                         )
                         .allowedMethods("*")
                         .allowedHeaders("*")
